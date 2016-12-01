@@ -324,19 +324,23 @@ NativeSensorManager::~NativeSensorManager()
 			delete context[i].driver;
 		}
 
-		list_for_each_safe(node, n, &context[i].listener) {
-			item = node_to_item(node, struct SensorRefMap, list);
-			if (item != NULL) {
-				list_remove(&item->list);
-				delete item;
+		if (!list_empty(&(context[i].listener))) {
+			list_for_each_safe(node, n, &context[i].listener) {
+				item = node_to_item(node, struct SensorRefMap, list);
+				if (item != NULL) {
+					list_remove(&item->list);
+					delete item;
+				}
 			}
 		}
 
-		list_for_each_safe(node, n, &context[i].dep_list) {
-			item = node_to_item(node, struct SensorRefMap, list);
-			if (item != NULL) {
-				list_remove(&item->list);
-				delete item;
+		if (!list_empty(&(context[i].dep_list))) {
+			list_for_each_safe(node, n, &context[i].dep_list) {
+				item = node_to_item(node, struct SensorRefMap, list);
+				if (item != NULL) {
+					list_remove(&item->list);
+					delete item;
+				}
 			}
 		}
 	}
@@ -779,14 +783,15 @@ int NativeSensorManager::getEventPath(const char *sysfs_path, char *event_path)
 	int len;
 	char *needle;
 
+	if ((sysfs_path == NULL) || (event_path == NULL)) {
+		ALOGE("invalid NULL argument.");
+		return -EINVAL;
+	}
+
 	dir = opendir(sysfs_path);
 	if (dir == NULL) {
 		ALOGE("open %s failed.(%s)\n", strerror(errno));
 		return -1;
-	}
-	if ((sysfs_path == NULL) || (event_path == NULL)) {
-		ALOGE("invalid NULL argument.");
-		return -EINVAL;
 	}
 
 	len = readlink(sysfs_path, symlink, PATH_MAX);
@@ -845,7 +850,7 @@ int NativeSensorManager::getSensorListInner()
 		return 0;
 	}
 	strlcpy(devname, dirname, PATH_MAX);
-	filename = devname + strlen(devname);
+	filename = devname + strlen(dirname);
 
 	while ((de = readdir(dir))) {
 		if(de->d_name[0] == '.' &&
