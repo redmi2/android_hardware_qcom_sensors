@@ -10,6 +10,8 @@ include $(CLEAR_VARS)
 
 ifeq ($(USE_SENSOR_MULTI_HAL),true)
   LOCAL_MODULE := sensors.native
+  LOCAL_PROPRIETARY_MODULE := true
+  LOCAL_VENDOR_MODULE := true
 else
   ifneq ($(filter msm8610,$(TARGET_BOARD_PLATFORM)),)
     LOCAL_MODULE := sensors.$(TARGET_BOARD_PLATFORM)
