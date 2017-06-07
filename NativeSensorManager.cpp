@@ -1176,7 +1176,7 @@ int NativeSensorManager::flush(int handle)
 	struct SensorRefMap *item;
 	struct listnode *node;
 
-	ALOGD("flush called:%d\n", handle);
+	ALOGD("flush called\n", handle);
 	list = getInfoByHandle(handle);
 	if (list == NULL) {
 		ALOGE("Invalid handle(%d)", handle);
